@@ -1,0 +1,110 @@
+apply plugin: 'com.android.application'
+apply from: 'com_cfg.gradle'
+
+android {
+    compileSdkVersion BUILD_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
+
+    signingConfigs {
+        config {
+            keyAlias KEY_ALIAS //密钥标识名
+            keyPassword KEY_PASSWORD //密钥密码
+            storeFile file(KEY_FILEPATH) //签名路径
+            storePassword KEY_STORE_PASSWORD //密钥库密码
+        }
+    }
+
+    defaultConfig {
+        applicationId "com.example.zhuangsj.myapplication"
+        minSdkVersion GP_MIN_SDK_VERSION
+        targetSdkVersion GP_TARGT_SDK_VERSION
+        versionCode GP_VERSION_CODE as int
+        versionName VERSION_NAME
+
+        applicationIdSuffix ".demo" //包名的后缀
+        versionNameSuffix "-demo" //版本名的后缀
+        multiDexEnabled true //配置方法数超过 64K 的应用
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        jackOptions {
+            enabled false
+        }
+    }
+
+    buildTypes {
+        release {
+            shrinkResources true //压缩资源
+            minifyEnabled true //压缩代码
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config  //签名
+            buildConfigField 'String','STATE_TEST','"release"' //自定义常量
+            resValue("string", "build_time", "1") //自定义资源
+        }
+        debug {
+            buildConfigField 'String','STATE_TEST','"debug"'
+            resValue("string", "build_time", "0")
+        }
+    }
+
+    flavorDimensions 'price', 'store' //有优先级，同级不会生成版本
+    productFlavors {
+        google {
+            dimension 'store'
+            // 设置后可以在AndroidMenifest.xml文件调用,一般用于设置 appkey
+            manifestPlaceholders = [CHANNEL_VALUE: "${CHANNEL_VALUE_GOOGLE}"]
+        }
+        amazon {
+            dimension 'store'
+            // 设置后可以在AndroidMenifest.xml文件调用,一般用于设置 appkey
+            manifestPlaceholders = [CHANNEL_VALUE: "${CHANNEL_VALUE_AMAZON}"]
+        }
+        free {
+            dimension 'price'
+        }
+        paid {
+            dimension 'price'
+        }
+    }
+
+    dataBinding {
+        enabled = true
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        //必须打开jack
+        sourceCompatibility = "1.8" //JavaVersion.VERSION_1_8
+        targetCompatibility = "1.8" //JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        //main.java.srcDirs += 'src/debugname'
+        main {
+            java.srcDirs += 'src/debugname'
+            //res.srcDirs = ['other/res1', 'other/res2']
+            //manifest.srcFile 'other/AndroidManifest.xml'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:design:24.2.0'
+    testCompile 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+
+
+    ext.supportLibVersion = "2.0.1" // 与创建新的gradle文件定义的形式一样
+    compile "io.reactivex.rxjava2:rxandroid:${supportLibVersion}"
+    compile 'io.reactivex.rxjava2:rxjava:2.1.1'
+    compile 'com.android.support:support-annotations:26.0.0-alpha1'
+}
+repositories {
+    mavenCentral()
+}

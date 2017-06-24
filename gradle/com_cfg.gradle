@@ -1,0 +1,23 @@
+// 通用配置
+// 通过 apply from: 'com_cfg.gradle' 之后才能使用
+ext {
+    // android
+    BUILD_SDK_VERSION = 24
+    BUILD_TOOLS_VERSION  =  "25.0.0"
+
+    //build config
+    MIN_SDK_VERSION  =  22
+    TARGT_SDK_VERSION  = 24
+    VERSION_CODE = 1
+    VERSION_NAME = "1.0"
+
+    //siging 这种不安全
+    KEY_ALIAS = 'G...'
+    KEY_PASSWORD = '123456'
+    KEY_FILEPATH = "cert.jks"
+    KEY_STORE_PASSWORD = '123456'
+
+    //appkey
+    CHANNEL_VALUE_AMAZON =  'amazon_appkey'
+    CHANNEL_VALUE_GOOGLE = 'google_appkey'
+}
