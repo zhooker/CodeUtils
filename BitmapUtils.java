@@ -146,4 +146,42 @@ public class BitmapUtils {
             return null;
         }
     }
+
+    /**
+     * 获取一个 View 的截图
+     *
+     * @param view
+     * @return
+     */
+    public static Bitmap getCacheBitmapFromView(View view) {
+        if (view == null)
+            return null;
+
+        // 如果view还没被放置在窗口中，这时宽高都是0，截图会是黑色的
+        if (view.getWidth() == 0 || view.getHeight() == 0) {
+            view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        }
+
+        Bitmap bitmap = null;
+        if (view instanceof TextureView) {
+            TextureView textureView = (TextureView) view;
+            int width = textureView.getWidth();
+            int height = textureView.getHeight();
+            bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            bitmap = textureView.getBitmap(bitmap);
+        } else {
+            // 方法一： 利用DrawingCache
+            view.setDrawingCacheEnabled(true);
+            view.buildDrawingCache();
+            bitmap = Bitmap.createBitmap(view.getDrawingCache());
+            view.setDrawingCacheEnabled(false);  //禁用DrawingCahce否则会影响性能
+
+            // 方法二: 利用view.draw
+//            bitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.ARGB_8888);
+//            Canvas cvs = new Canvas(bitmap);
+//            view.draw(cvs);
+        }
+        return bitmap;
+    }
 }
